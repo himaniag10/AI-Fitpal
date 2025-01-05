@@ -13,7 +13,6 @@ AI-Fitpal is a backend API designed to provide AI-driven fitness insights. This 
 
 ### Prerequisites
 - Node.js and npm installed.
-- Create a `.env` file to store environment variables (refer to `.env.example`).
 
 ### Installation
 
