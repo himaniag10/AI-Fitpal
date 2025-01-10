@@ -11,8 +11,8 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Logic for login or signup
-    navigate('/profile'); // Redirect to profile page
+    
+    navigate('/profile'); 
   };
 
   return (
