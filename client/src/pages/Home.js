@@ -1,7 +1,7 @@
 import React from 'react';
-import 'animate.css'; // Import Animate.css
-import fitnessImage from '../assets/fitness.jpg'; // Ensure the image is present in the assets folder
-import profileLogo from '../assets/profile-user.png'; // Replace with your logo path
+import 'animate.css'; 
+import fitnessImage from '../assets/fitness.jpg'; 
+import profileLogo from '../assets/profile-user.png';
 
 const Home = () => {
   return (
