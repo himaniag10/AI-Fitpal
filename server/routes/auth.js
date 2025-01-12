@@ -1,67 +1,124 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-require('dotenv').config();
-
 const router = express.Router();
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) return res.sendStatus(401);
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403); 
-        req.user = user;
-        next();
-    });
-}
-
-// Register route
-router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
-
+router.post('/signup', async (req, res) => {
+    const { name, username, email, password, confirmPassword } = req.body;
+    
+    if (!name || !username || !email || !password) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+    
+    if (confirmPassword && password !== confirmPassword) {
+        return res.status(400).json({ message: 'Passwords do not match.' });
+    }
+    
     try {
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Email or Username already exists' });
+        }
         
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) return res.status(400).json({ message: 'Username or email already exists' });
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const newUser = new User({ username, email, password: hashedPassword });
-        await newUser.save();
-        res.status(201).json({ message: 'User registered successfully' });
+        const newUser = new User({
+            name,
+            username,
+            email: email.trim().toLowerCase(),
+            password: password.trim()
+        });
+        
+        const savedUser = await newUser.save();
+        
+        res.status(201).json({ 
+            message: 'User registered successfully',
+            userId: savedUser._id
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Registration error', error: error.message });
+        res.status(500).json({ message: 'Error registering user', error: error.message });
     }
 });
 
-// Login route
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
     try {
-        const user = await User.findOne({ username });
-        if (!user) return res.status(400).json({ message: 'Invalid credentials' });
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) return res.status(400).json({ message: 'Invalid credentials' });
-
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
-        res.status(200).json({ token, user: { username: user.username, email: user.email } });
+        let { email, password } = req.body;
+        
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+        
+        email = email.trim().toLowerCase();
+        password = password.trim();
+        
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        
+        const token = jwt.sign(
+            { 
+                id: user._id,
+                email: user.email,
+                username: user.username 
+            },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+        
+        res.status(200).json({
+            status: 'success',
+            message: 'Login successful',
+            token,
+            userId: user._id,
+            name: user.name,
+            username: user.username,
+            isDetailsComplete: user.isDetailsComplete
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Login error', error: error.message });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 
-router.get('/profile', authenticateToken, async (req, res) => {
+router.post('/update-details', async (req, res) => {
     try {
-        const user = await User.findById(req.user.id); // Fetch user data using ID from the token
-        if (!user) return res.sendStatus(404); // If user not found, return 404
+        const { userId, age, height, weight, fitnessLevel, dietaryPreferences, goals } = req.body;
 
-        res.json({ username: user.username, email: user.email, profilePicture: user.profilePicture, age: user.age, height: user.height, weight: user.weight });
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (height && !/^(\d+)'(\d+)"?$/.test(height)) {
+            return res.status(400).json({ message: 'Height must be in the format: 5\'10"' });
+        }
+
+        if (age) user.age = age;
+        if (height) user.height = height;
+        if (weight) user.weight = weight;
+        if (fitnessLevel) user.fitnessLevel = fitnessLevel;
+        if (dietaryPreferences) user.dietaryPreferences = dietaryPreferences;
+        if (goals) user.goals = goals;
+
+        if (age && height && weight && fitnessLevel && dietaryPreferences && goals) {
+            user.isDetailsComplete = true;
+        }
+
+        await user.save();
+
+        res.json({
+            message: 'Details updated successfully',
+            userId: user._id,
+            isDetailsComplete: user.isDetailsComplete
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching user data', error: error.message });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 

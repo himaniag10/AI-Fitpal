@@ -1,10 +1,11 @@
 import React from 'react';
 import './styles/tailwind.css';
-import {BrowserRouter,Route, Routes } from 'react-router-dom';
-import Home from './pages/Home'; // Correct path for Home page
-import SignUp from './pages/SignUp'; // Make sure this matches the file name and case
-import About from './pages/About'; // Make sure this matches the actual file name
-import Contact from './pages/Contact'; // Make sure this matches the actual file name
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import SignUp from './pages/SignUp';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import TestBackend from './pages/TestBackend'; // Import TestBackend page
 import 'animate.css';
 
 const App = () => {
@@ -15,6 +16,9 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        
+        <Route path="/test-backend" element={<TestBackend />} /> {/* New Route */}
+        <Route path="*" element={<div>Page Not Found</div>} /> {/* Fallback Route */}
       </Routes>
     </BrowserRouter>
   );

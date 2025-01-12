@@ -1,118 +1,75 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
+const SALT_ROUNDS = 10;
+
+// User Schema
 const userSchema = new mongoose.Schema({
+    name: {                     
+        type: String,
+        required: [true, 'Name is required'],
+        trim: true,
+    },
     username: {
         type: String,
-        required: true,
-        unique: true,
-        trim: true, 
-    },
-    password: {
-        type: String,
-        required: true,
-        validate: {
-            validator: function (v) {
-                return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(v);
-            },
-            message: 'Password must be at least 8 characters long and include a letter and a number.',
-        },
+        required: [true, 'Username is required'],
+        trim: true,
     },
     email: {
         type: String,
-        required: true,
+        required: [true, 'Email is required'],
         unique: true,
-        validate: {
-            validator: function (v) {
-                return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(v);
-            },
-            message: props => `${props.value} is not a valid email!`,
-        },
+        trim: true,
+        match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
     },
-    profilePicture: {
+    password: {
         type: String,
-        default: 'https://example.com/default-profile-picture.png', 
+        required: [true, 'Password is required'],
+        minlength: [8, 'Password must be at least 8 characters'],
     },
     age: {
         type: Number,
-        min: [0, 'Age must be a positive number.'],
-        max: [120, 'Age must be less than 120 years.'],
-        default: null,
+        min: [0, 'Age must be a positive number'],
     },
     height: {
         type: String,
-        default: '',
         validate: {
             validator: function (v) {
-                return /^(\d+)'(\d+)"?$/.test(v);
+                return !v || /^(\d+)'(\d+)"?$/.test(v); 
             },
-            message: props => `${props.value} is not a valid height format!`,
+            message: 'Height must be in the format: 5\'10"',
         },
     },
     weight: {
         type: Number,
-        min: [0, 'Weight must be a positive number.'],
-        default: null, 
-    },
-    goals: {
-        type: [String],
-        default: [],
+        min: [0, 'Weight must be a positive number'],
     },
     fitnessLevel: {
         type: String,
         enum: ['Beginner', 'Intermediate', 'Advanced'],
-        default: 'Beginner',
     },
     dietaryPreferences: {
-        type: String,
-        enum: ['Vegetarian', 'Non-Vegetarian', 'Vegan', 'Pescatarian'],
-        default: 'Non-Vegetarian',
+        type: [String], 
     },
-    activityLog: {
-        type: [
-            {
-                date: {
-                    type: Date,
-                    default: Date.now,
-                },
-                activityType: {
-                    type: String,
-                    required: [true, 'Activity type is required.'],
-                },
-                duration: {
-                    type: Number,
-                    required: [true, 'Duration is required.'],
-                    min: [1, 'Duration must be at least 1 minute.'],
-                },
-                caloriesBurned: {
-                    type: Number,
-                    required: [true, 'Calories burned is required.'],
-                    min: [0, 'Calories burned cannot be negative.'],
-                },
-            },
-        ],
-        default: [],
+    goals: {
+        type: [String], 
+    },
+    isDetailsComplete: {
+        type: Boolean,
+        default: false,
     },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
-        const salt = await bcrypt.genSalt(12);
-        this.password = await bcrypt.hash(this.password, salt);
+        const hashedPassword = await bcrypt.hash(this.password, SALT_ROUNDS);
+        this.password = hashedPassword;
     }
     next();
 });
 
-userSchema.methods.getActivityLogs = function () {
-    return this.activityLog;
+userSchema.statics.findByEmail = async function (email) {
+    return this.findOne({ email: email.trim() });
 };
 
-userSchema.statics.findByEmail = function (email) {
-    return this.findOne({ email });
-};
-
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
