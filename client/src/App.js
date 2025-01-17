@@ -4,8 +4,10 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import SignUp from './pages/SignUp';
 import About from './pages/About';
+import Profile from './pages/Profile';
 import Contact from './pages/Contact';
-import TestBackend from './pages/TestBackend'; // Import TestBackend page
+import UpdateDetails from './pages/UpdateDetails';
+import TestBackend from './pages/TestBackend'; 
 import 'animate.css';
 
 const App = () => {
@@ -16,9 +18,10 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        
-        <Route path="/test-backend" element={<TestBackend />} /> {/* New Route */}
-        <Route path="*" element={<div>Page Not Found</div>} /> {/* Fallback Route */}
+        <Route path="/update-details" element={<UpdateDetails />} />
+        <Route path="/profile" element={<Profile />} /> 
+        <Route path="/test-backend" element={<TestBackend />} /> 
+        <Route path="*" element={<div>Page Not Found</div>} /> 
       </Routes>
     </BrowserRouter>
   );

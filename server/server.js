@@ -6,7 +6,7 @@ const authRoutes = require('./routes/auth');
 const insightsRoutes = require('./routes/insights');
 
 
-// Load env vars
+
 dotenv.config();
 
 const app = express();
@@ -14,6 +14,7 @@ app.use(cors({
     origin: 'http://localhost:3000', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
     credentials: true, 
+    allowedHeaders: ['Content-Type', 'Authorization']
   }));
 connectDB();
 
@@ -30,11 +31,11 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
-// Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/insights', insightsRoutes);
 
-// Test route
+
 app.get('/', (req, res) => {
     res.send('FitPal Backend API is Running');
 });

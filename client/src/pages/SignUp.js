@@ -86,11 +86,20 @@ const Signup = () => {
       });
 
       const result = await response.json();
+      console.log('Signup Response:', result);
       setLoading(false);
 
       if (response.ok) {
         console.log('Response:', result);
-        navigate('/profile'); // Redirect to profile on success
+        localStorage.setItem('token', result.token);
+        console.log('Token stored:', localStorage.getItem('token'));
+        localStorage.setItem('userId', result.userId);
+        localStorage.setItem('username', result.username);
+        if(isLogin){
+        navigate('/profile');
+      } else {
+        navigate('/update-details');
+      }
       } else {
         console.error('Server Error:', result);
         setError(result.message || 'Something went wrong. Please try again.');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { testBackend } from '../api/api'; // Import API function from the API folder
+import { testBackend } from '../api/api'; 
 
 const TestBackend = () => {
   const [message, setMessage] = useState('');
@@ -7,7 +7,7 @@ const TestBackend = () => {
   const handleTest = async () => {
     try {
       const data = await testBackend();
-      setMessage(data.message); // Expecting a `message` key in backend response
+      setMessage(data.message); 
     } catch (error) {
       setMessage('Error connecting to the backend.');
     }
