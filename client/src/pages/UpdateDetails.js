@@ -14,6 +14,8 @@ const UpdateDetails = () => {
     fitnessLevel: "",
     dietaryPreferences: "",
     goals: "",
+    gender: "", 
+    allergies: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -78,7 +80,7 @@ const UpdateDetails = () => {
       return;
     }
 
-    const requiredFields = ['age', 'weight', 'fitnessLevel', 'dietaryPreferences', 'goals'];
+    const requiredFields = ['age', 'weight', 'fitnessLevel', 'dietaryPreferences', 'goals','gender', 'allergies'];
     const emptyFields = requiredFields.filter(field => !formData[field]);
     if (emptyFields.length > 0) {
       setError("Please fill in all fields");
@@ -92,7 +94,9 @@ const UpdateDetails = () => {
       weight: formData.weight,
       fitnessLevel: formData.fitnessLevel,
       dietaryPreferences: formData.dietaryPreferences,
-      goals: formData.goals
+      goals: formData.goals,
+      gender: formData.gender, 
+      allergies: formData.allergies,
     };
 
     try {
@@ -228,7 +232,29 @@ const UpdateDetails = () => {
           <option value="Vegan">Vegan</option>
           <option value="Keto">Keto</option>
         </select>
+        
+        
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
 
+       
+        <input
+          type="text"
+          name="allergies"
+          value={formData.allergies}
+          onChange={handleChange}
+          placeholder="Enter any allergies"
+          className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         <select
           name="goals"
           value={formData.goals}

@@ -100,6 +100,8 @@ const Profile = () => {
           label="Dietary Preferences" 
           value={userData.dietaryPreferences || "Not provided"} 
         />
+        <ProfileField label="Gender" value={userData.gender || "Not provided"} />
+        <ProfileField label="Allergies" value={userData.allergies || "Not provided"} />
         <ProfileField label="Goals" value={userData.goals || "Not provided"} />
       </div>
 

@@ -54,6 +54,8 @@ const userSchema = new mongoose.Schema({
     goals: {
         type: [String], 
     },
+    gender: { type: String, enum: ["Male", "Female", "Other"] }, 
+    allergies: { type: String },
     isDetailsComplete: {
         type: Boolean,
         default: false,

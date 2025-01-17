@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import Contact from './pages/Contact';
 import UpdateDetails from './pages/UpdateDetails';
 import TestBackend from './pages/TestBackend'; 
+import Insights from "./pages/Insights";
 import 'animate.css';
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/update-details" element={<UpdateDetails />} />
         <Route path="/profile" element={<Profile />} /> 
+        <Route path="/insights" element={<Insights />} />
         <Route path="/test-backend" element={<TestBackend />} /> 
         <Route path="*" element={<div>Page Not Found</div>} /> 
       </Routes>

@@ -126,7 +126,7 @@ router.post('/update-details', async (req, res) => {
         }
         console.log("Request Body:", req.body);
 
-        const { age, height, weight, fitnessLevel, dietaryPreferences, goals } = req.body;
+        const { age, height, weight, fitnessLevel, dietaryPreferences, goals, gender, allergies } = req.body;
 
         const user = await User.findById(userId);
         console.log("User Found:", user);
@@ -147,8 +147,10 @@ router.post('/update-details', async (req, res) => {
         if (fitnessLevel) user.fitnessLevel = fitnessLevel;
         if (dietaryPreferences) user.dietaryPreferences = dietaryPreferences;
         if (goals) user.goals = goals;
+        if (gender) user.gender = gender;
+        if (allergies) user.allergies = allergies;
 
-        if (age && height && weight && fitnessLevel && dietaryPreferences && goals) {
+        if (age && height && weight && fitnessLevel && dietaryPreferences && goals && gender && allergies) {
             user.isDetailsComplete = true;
         }
 
